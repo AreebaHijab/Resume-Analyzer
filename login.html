@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Resume Analyzer</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Resume Analyzer</h1>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail">
+                <p id="loginEmailError"></p>
+
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword">
+                <p id="loginPasswordError"></p>
+                <p id="loginError"></p>
+                <button typr="submit">Login</button>
+            </form>
+        </section>
+    </main>
+    <script src="js/auth.js"></script>
+</body>
+</html>

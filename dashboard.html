@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <header>
+        <h1>Resume Analyzer</h1>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html">Home</a>
+            <button id="logoutBtn">Logout </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="dashboard">
+            <h2>Welcome to Your Dashboard</h2>
+            <p>
+                Analyzer to your resume and improve your career profile
+            </p>
+            <div class="dashboard-cards">
+
+                <!-- Resume Analyzer Card -->
+                <div class="card analyzer-card">
+                    <div class="card-icon analyzer-icon">📄</div>
+
+                    <h3>Resume Analyzer</h3>
+
+                    <p>
+                        Upload your resume and analyze your skills and content.
+                    </p>
+
+                    <input type="file" id="resumeFile" accept=".txt,.pdf,.doc,.docx">
+
+                    <button id="analyzeBtn">🔍 Analyze Resume</button>
+                </div>
+
+
+                <!-- Resume Tips Card -->
+                <div class="card">
+                    <div class="card-icon tips-icon">💡</div>
+
+                    <h3>Resume Tips</h3>
+
+                    <p id="tipsDescription" style="display: none;">
+                        Learn useful tips to improve your resume.
+                    </p>
+
+                    <button id="tipsBtn">💡 View Tips</button>
+                </div>
+
+
+                <!-- Resume Score Card -->
+                <div class="card">
+                    <div class="card-icon score-icon">📊</div>
+
+                        <h3>Resume Score</h3>
+
+                        <p id="scoreDescription" style="display: none;">
+                            See your resume score after analysis.
+                        </p>
+
+                        <button id="scoreBtn">📊 View Score</button>
+                        <button id="downloadReportBtn"> Download Report</button>
+                    </div>
+
+            </div>
+
+
+                <!-- Results BELOW all three cards -->
+                <div class="dashboard-results">
+
+                    <div id="analysisResult"></div>
+
+                    <div id="tipsResult" style="display: none;"></div>
+
+                    <div id="scoreResult" style="display: none;"></div>
+
+                </div>
+        </section>
+    </main>
+    
+
+    <script src="js/dashboard.js"></script>
+
+    <script src="js/analyzer.js"></script>
+</body>
+</html>
