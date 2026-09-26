@@ -8,7 +8,7 @@ An web application that analyzes resumes, provides feedback, and gives tips to i
 - User Authentication (Login / Register)
 - Resume Upload and Analysis
 - Dashboard with personalized feedback
-- AI-based Tips & Suggestions
+- Suggestions
 - Clean and Responsive UI
 
 ### 🛠️ Tech Stack
