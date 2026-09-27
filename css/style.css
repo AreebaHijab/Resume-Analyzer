@@ -447,3 +447,48 @@ button:hover {
         display: none;
     }
 }
+@media (max-width: 800px) {
+
+    /* Hide the original results section on mobile */
+    .dashboard-results {
+        display: none !important;
+    }
+
+    /* Mobile analysis result */
+    #mobileAnalysisResult {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    /* Mobile tips result */
+    #mobileTipsResult {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    /* Mobile score result */
+    #mobileScoreResult {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    #mobileAnalysisResult h3,
+    #mobileTipsResult h3,
+    #mobileScoreResult h3 {
+        color: #18345f;
+        margin-top: 18px;
+    }
+
+    #mobileAnalysisResult p,
+    #mobileTipsResult p,
+    #mobileScoreResult p {
+        line-height: 1.5;
+    }
+
+    #mobileAnalysisResult ul,
+    #mobileTipsResult ul,
+    #mobileScoreResult ul {
+        padding-left: 20px;
+    }
+
+}

@@ -93,81 +93,70 @@
     <script src="js/dashboard.js"></script>
 
     <script src="js/analyzer.js"></script>
-    <script>
+       <script>
 
-        const analysisResult =
-            document.getElementById("analysisResult");
+            const originalAnalysis =
+                document.getElementById("analysisResult");
 
-        const tipsResult =
-            document.getElementById("tipsResult");
+            const originalTips =
+                document.getElementById("tipsResult");
 
-        const scoreResult =
-            document.getElementById("scoreResult");
+            const originalScore =
+                document.getElementById("scoreResult");
 
+            const mobileAnalysis =
+                document.getElementById("mobileAnalysisResult");
 
-        const mobileAnalysisResult =
-            document.getElementById("mobileAnalysisResult");
+            const mobileTips =
+                document.getElementById("mobileTipsResult");
 
-        const mobileTipsResult =
-            document.getElementById("mobileTipsResult");
-
-        const mobileScoreResult =
-            document.getElementById("mobileScoreResult");
-
-
-        const resultsContainer =
-            document.querySelector(".dashboard-results");
+            const mobileScore =
+                document.getElementById("mobileScoreResult");
 
 
-        function moveResults() {
+            function updateMobileResults() {
 
-            if (window.innerWidth <= 800) {
+                if (window.innerWidth <= 800) {
 
-                // Analysis → Analyzer card
-                mobileAnalysisResult.appendChild(
-                    analysisResult
-                );
+                    mobileAnalysis.innerHTML =
+                        originalAnalysis.innerHTML;
 
+                    mobileTips.innerHTML =
+                        originalTips.innerHTML;
 
-                // Tips → Tips card
-                mobileTipsResult.appendChild(
-                    tipsResult
-                );
+                    mobileScore.innerHTML =
+                        originalScore.innerHTML;
 
-
-                // Score → Score card
-                mobileScoreResult.appendChild(
-                    scoreResult
-                );
-
-            } else {
-
-                // Desktop → Results section
-
-                resultsContainer.appendChild(
-                    analysisResult
-                );
-
-                resultsContainer.appendChild(
-                    tipsResult
-                );
-
-                resultsContainer.appendChild(
-                    scoreResult
-                );
+                }
             }
-        }
 
 
-        moveResults();
+            const observer = new MutationObserver(function () {
+                updateMobileResults();
+            });
 
 
-        window.addEventListener(
-            "resize",
-            moveResults
-        );
+            observer.observe(originalAnalysis, {
+                childList: true,
+                subtree: true
+            });
 
-    </script>
+            observer.observe(originalTips, {
+                childList: true,
+                subtree: true
+            });
 
+            observer.observe(originalScore, {
+                childList: true,
+                subtree: true
+            });
+
+
+            updateMobileResults();
+
+
+            window.addEventListener("resize", updateMobileResults);
+
+        </script>
 </body>
 </html>
