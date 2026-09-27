@@ -1,8 +1,8 @@
-const resumeFile=document.getElementById("resumeFile");
-const analyzeBtn=document.getElementById("analyzeBtn");
-const analysisResult=document.getElementById("analysisResult");
+const resumeFile = document.getElementById("resumeFile");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const analysisResult = document.getElementById("analysisResult");
 
-const technicalSkills =[
+const technicalSkills = [
     "html",
     "css",
     "javascript",
@@ -14,360 +14,884 @@ const technicalSkills =[
     "github",
     "node.js"
 ];
-analyzeBtn.addEventListener("click" , function(){
-    if(resumeFile.files.length ===0){
-        analysisResult.textContent="Please select your resume first."
-        return;
+
+
+// ========================================
+// PDF TEXT READER
+// ========================================
+
+async function readPDF(file) {
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+        data: arrayBuffer
+    }).promise;
+
+    let fullText = "";
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+
+        const page = await pdf.getPage(pageNumber);
+
+        const textContent = await page.getTextContent();
+
+        const pageText = textContent.items
+            .map(function (item) {
+                return item.str;
+            })
+            .join(" ");
+
+        fullText += pageText + "\n";
     }
-    const file=resumeFile.files[0];
-    //analysisResult.textContent="Resume Selected:" +file.name;
+
+    return fullText;
+}
 
 
+// ========================================
+// DOCX TEXT READER
+// ========================================
 
-    if(file.type !== "text/plain"){
-        analysisResult.textContent="For this demo, plese upload a .txt resume file.";
-        return;
+async function readDOCX(file) {
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    const result = await mammoth.extractRawText({
+        arrayBuffer: arrayBuffer
+    });
+
+    return result.value;
+}
+
+
+// ========================================
+// MAIN ANALYZER
+// ========================================
+
+function analyzeResume(resumeText, fileName) {
+
+    resumeText = resumeText.toLowerCase();
+
+
+    // ========================================
+    // TECHNICAL SKILLS
+    // ========================================
+
+    let foundSkills = [];
+    let missingSkills = [];
+
+    technicalSkills.forEach(function (skill) {
+
+        const skillPattern = new RegExp(
+            "\\b" + skill.replace(".", "\\.") + "\\b",
+            "i"
+        );
+
+        if (skillPattern.test(resumeText)) {
+
+            foundSkills.push(skill);
+
+        } else {
+
+            missingSkills.push(skill);
+
+        }
+
+    });
+
+
+    // ========================================
+    // RESUME SECTIONS
+    // ========================================
+
+    const keywords = [
+        "skills",
+        "education",
+        "experience",
+        "projects"
+    ];
+
+    let found = 0;
+    let missing = [];
+
+    keywords.forEach(function (keyword) {
+
+        if (resumeText.includes(keyword)) {
+
+            found++;
+
+        } else {
+
+            missing.push(keyword);
+
+        }
+
+    });
+
+
+    // ========================================
+    // EMAIL
+    // ========================================
+
+    const emailPattern =
+        /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
+
+    const hasEmail =
+        emailPattern.test(resumeText);
+
+
+    // ========================================
+    // PHONE
+    // ========================================
+
+    const cleanResumeText =
+        resumeText.replace(/[\s-]/g, "");
+
+    const phonePattern =
+        /(?:\+92|0092|0)3\d{9}/;
+
+    const hasPhone =
+        phonePattern.test(cleanResumeText);
+
+
+    if (hasEmail) {
+
+        found++;
+
+    } else {
+
+        missing.push("email");
+
     }
-    //loading message
-    //analysisResult.innerHTML=`<div class="loading-message"><p>Analyzing your resume...</p></div>`;
 
 
-    const reader = new FileReader();
-    reader.onload=function(event){
-        const resumeText=event.target.result.toLowerCase();
+    if (hasPhone) {
 
-        let foundSkills=[];
-        let missingSkills=[];
-        technicalSkills.forEach(function(skill){
+        found++;
 
-            const skillPattern=new RegExp("\\b" + skill.replace(".","\\.") +"\\b","i");
-            if(skillPattern.test(resumeText)){
-                foundSkills.push(skill);
-            }
-            else{
-                missingSkills.push(skill);
-            }
-        });
+    } else {
+
+        missing.push("phone");
+
+    }
 
 
+    // ========================================
+    // TOTAL SECTIONS
+    // ========================================
+
+    const totalSections =
+        keywords.length + 2;
 
 
-        const keywords=[
-            "skills",
-            "education",
-            "experience",
-            "projects"
-        ];
-        let found=0;
-        let missing=[];
+    // ========================================
+    // IMPROVEMENT SUGGESTIONS
+    // ========================================
 
-        keywords.forEach((keyword) =>{
-            if(resumeText.includes(keyword)){
-                found++;
-            }
-            else{
-                missing.push(keyword);
-            }
-        });
-        const emailPattern=/[^\s@]+@[^\s@]+\.[^\s@]+/;
-        const hasEmail=emailPattern.test(resumeText);
-        const cleanResumeText=resumeText.replace(/[\s-]/g,"");
+    let suggestions = [];
 
-        const phonePattern=/(?:\+92|0092|0)3\d{9}/;
-        const hasPhone=phonePattern.test(resumeText);
 
-        if(hasEmail){
-            found++;
-        }else{
-            missing.push("email");
-        }
+    if (missing.includes("education")) {
 
-        if(hasPhone){
-            found++;
-        }else{
-            missing.push("phone");
-        }
+        suggestions.push(
+            "Add your education details."
+        );
 
-        const totalSections=keywords.length +2;
-        // =========================
-        // IMPROVEMENT SUGGESTIONS
-        // =========================
+    }
 
-        let suggestions = [];
 
-        if (missing.includes("education")) {
-            suggestions.push("Add your education details.");
-        }
+    if (missing.includes("experience")) {
 
-        if (missing.includes("experience")) {
-            suggestions.push("Add your work or internship experience.");
-        }
+        suggestions.push(
+            "Add your work or internship experience."
+        );
 
-        if (missing.includes("projects")) {
-            suggestions.push("Add your projects to show your practical skills.");
-        }
+    }
 
-        if (missing.includes("skills")) {
-            suggestions.push("Add a clear technical skills section.");
-        }
 
-        if (missing.includes("email")) {
-            suggestions.push("Add a professional email address.");
-        }
+    if (missing.includes("projects")) {
 
-        if (missing.includes("phone")) {
-            suggestions.push("Add your phone number in the contact section.");
-        }
+        suggestions.push(
+            "Add your projects to show your practical skills."
+        );
 
-        if (foundSkills.length < 4) {
-            suggestions.push("Add more relevant technical skills to your resume.");
-        }
+    }
 
-        if (suggestions.length === 0) {
-            suggestions.push("Your resume has all the important sections. Keep improving the content.");
-        }
 
-        const sectionScore=Math.round((found/totalSections)*100);
-        const skillScore=Math.round((foundSkills.length/technicalSkills.length)*100);
-        const score=Math.round((sectionScore + skillScore)/2);
-        localStorage.setItem("sectionScore", sectionScore);
-        localStorage.setItem("skillScore", skillScore);
-        localStorage.setItem("resumeScore", score);
-        
-        
+    if (missing.includes("skills")) {
 
-        analysisResult.innerHTML=`
+        suggestions.push(
+            "Add a clear technical skills section."
+        );
+
+    }
+
+
+    if (missing.includes("email")) {
+
+        suggestions.push(
+            "Add a professional email address."
+        );
+
+    }
+
+
+    if (missing.includes("phone")) {
+
+        suggestions.push(
+            "Add your phone number in the contact section."
+        );
+
+    }
+
+
+    if (foundSkills.length < 4) {
+
+        suggestions.push(
+            "Add more relevant technical skills to your resume."
+        );
+
+    }
+
+
+    if (suggestions.length === 0) {
+
+        suggestions.push(
+            "Your resume has all the important sections. Keep improving the content."
+        );
+
+    }
+
+
+    // ========================================
+    // SCORE CALCULATION
+    // ========================================
+
+    const sectionScore =
+        Math.round(
+            (found / totalSections) * 100
+        );
+
+
+    const skillScore =
+        Math.round(
+            (foundSkills.length / technicalSkills.length) * 100
+        );
+
+
+    const score =
+        Math.round(
+            (sectionScore + skillScore) / 2
+        );
+
+
+    // ========================================
+    // SAVE SCORES
+    // ========================================
+
+    localStorage.setItem(
+        "sectionScore",
+        sectionScore
+    );
+
+    localStorage.setItem(
+        "skillScore",
+        skillScore
+    );
+
+    localStorage.setItem(
+        "resumeScore",
+        score
+    );
+
+
+    // ========================================
+    // DISPLAY ANALYSIS
+    // ========================================
+
+    analysisResult.innerHTML = `
+
         <h3>Resume Analysis</h3>
 
-        <p><strong>Resume:</strong> ${file.name}</p>
-
-        <p><strong>Score:</strong> ${sectionScore}%</p>
-
-        <p><strong>Sections Found:</strong> ${found}/${totalSections}</p>
-
-        <p><strong>Missing Sections:</strong> 
-        ${missing.length > 0 ? missing.join(", ") : "None"}
+        <p>
+            <strong>Resume:</strong>
+            ${fileName}
         </p>
+
+        <p>
+            <strong>Section Score:</strong>
+            ${sectionScore}%
+        </p>
+
+        <p>
+            <strong>Sections Found:</strong>
+            ${found}/${totalSections}
+        </p>
+
+        <p>
+            <strong>Missing Sections:</strong>
+            ${
+                missing.length > 0
+                    ? missing.join(", ")
+                    : "None"
+            }
+        </p>
+
 
         <h3>Technical Skills</h3>
 
-        <p><strong>Skills Found:</strong>
-        ${foundSkills.length > 0 ? foundSkills.join(", ") : "None"}
+        <p>
+            <strong>Skills Found:</strong>
+            ${
+                foundSkills.length > 0
+                    ? foundSkills.join(", ")
+                    : "None"
+            }
         </p>
 
-        <p><strong>Missing Skills:</strong>
-        ${missingSkills.length > 0 ? missingSkills.join(", ") : "None"}
+        <p>
+            <strong>Missing Skills:</strong>
+            ${
+                missingSkills.length > 0
+                    ? missingSkills.join(", ")
+                    : "None"
+            }
         </p>
+
+
         <h3>Improvement Suggestions</h3>
 
         <ul>
+
             ${
                 suggestions.map(function (suggestion) {
+
                     return `<li>${suggestion}</li>`;
+
                 }).join("")
             }
+
         </ul>
 
+    `;
+}
+
+
+// ========================================
+// ANALYZE BUTTON
+// ========================================
+
+analyzeBtn.addEventListener(
+    "click",
+    async function () {
+
+        if (resumeFile.files.length === 0) {
+
+            analysisResult.textContent =
+                "Please select your resume first.";
+
+            return;
+        }
+
+
+        const file =
+            resumeFile.files[0];
+
+
+        const fileName =
+            file.name.toLowerCase();
+
+
+        // ========================================
+        // FILE TYPE CHECK
+        // ========================================
+
+        if (
+            !fileName.endsWith(".txt") &&
+            !fileName.endsWith(".docx") &&
+            !fileName.endsWith(".pdf")
+        ) {
+
+            analysisResult.textContent =
+                "Please upload a TXT, DOCX or PDF resume.";
+
+            return;
+        }
+
+
+        // ========================================
+        // LOADING MESSAGE
+        // ========================================
+
+        analysisResult.innerHTML = `
+            <p>Analyzing your resume...</p>
         `;
 
 
-    };
-    reader.readAsText(file);
-});
+        try {
+
+            let resumeText = "";
 
 
+            // ========================================
+            // TXT
+            // ========================================
 
-const tipsBtn=document.getElementById("tipsBtn");
-//const tipsResult=document.getElementById("tipsResult");
+            if (fileName.endsWith(".txt")) {
 
-tipsBtn.addEventListener("click",function(){
+                resumeText =
+                    await file.text();
 
-    if(resumeFile.files.length ===0){
-        alert("Please select your resume first.");
-        return;
+            }
+
+
+            // ========================================
+            // DOCX
+            // ========================================
+
+            else if (fileName.endsWith(".docx")) {
+
+                resumeText =
+                    await readDOCX(file);
+
+            }
+
+
+            // ========================================
+            // PDF
+            // ========================================
+
+            else if (fileName.endsWith(".pdf")) {
+
+                resumeText =
+                    await readPDF(file);
+
+            }
+
+
+            // ========================================
+            // EMPTY FILE CHECK
+            // ========================================
+
+            if (!resumeText.trim()) {
+
+                analysisResult.innerHTML = `
+                    <p>
+                        Unable to find readable text in this resume.
+                    </p>
+                `;
+
+                return;
+            }
+
+
+            // ========================================
+            // RUN ANALYSIS
+            // ========================================
+
+            analyzeResume(
+                resumeText,
+                file.name
+            );
+
+
+        } catch (error) {
+
+            console.log(error);
+
+            analysisResult.innerHTML = `
+                <p>
+                    Unable to read this resume file.
+                </p>
+            `;
+        }
+
     }
+);
 
 
-    const tipsDescription= document.getElementById("tipsDescription");
-    const tipsResult=document.getElementById("tipsResult");
-    tipsDescription.style.display="block";
-    tipsResult.style.display="block";
+// ========================================
+// RESUME TIPS - FETCH API
+// ========================================
+
+const tipsBtn =
+    document.getElementById("tipsBtn");
 
 
-    tipsResult.innerHTML="<p>Loading tips....</p>";
+tipsBtn.addEventListener(
+    "click",
+    function () {
 
-    fetch("data/tips.json")
-    .then(function (response){
-        return response.json();
+        if (resumeFile.files.length === 0) {
 
-    })
-    .then(function(data){
-        let tipsHTML="<h3>Resume Improvement Tips</h3>";
-        tipsHTML +="<ul>";
-        data.tips.forEach(function(tip){
-            tipsHTML+=`<li>${tip}</li>`;
+            alert(
+                "Please select your resume first."
+            );
 
-        });
-        tipsHTML+="</ul>";
-        tipsResult.innerHTML=tipsHTML;
-
-    })
-    .catch(function(error){
-        tipsResult.innerHTML="<p>Unable to load resume tips.</p>";
-        console.log(error);
-    });
-    
-});
+            return;
+        }
 
 
+        const tipsDescription =
+            document.getElementById(
+                "tipsDescription"
+            );
 
 
+        const tipsResult =
+            document.getElementById(
+                "tipsResult"
+            );
 
-const scoreBtn = document.getElementById("scoreBtn");
-//const scoreResult=document.getElementById("scoreResult");
 
-scoreBtn.addEventListener("click", function () {
+        tipsDescription.style.display =
+            "block";
 
-    if(resumeFile.files.length ===0){
-        alert("Please select your resume first.");
-        return;
+
+        tipsResult.style.display =
+            "block";
+
+
+        tipsResult.innerHTML =
+            "<p>Loading tips....</p>";
+
+
+        fetch("data/tips.json")
+
+            .then(function (response) {
+
+                return response.json();
+
+            })
+
+
+            .then(function (data) {
+
+                let tipsHTML =
+                    "<h3>Resume Improvement Tips</h3>";
+
+
+                tipsHTML += "<ul>";
+
+
+                data.tips.forEach(
+                    function (tip) {
+
+                        tipsHTML +=
+                            `<li>${tip}</li>`;
+
+                    }
+                );
+
+
+                tipsHTML += "</ul>";
+
+
+                tipsResult.innerHTML =
+                    tipsHTML;
+
+            })
+
+
+            .catch(function (error) {
+
+                tipsResult.innerHTML =
+                    "<p>Unable to load resume tips.</p>";
+
+                console.log(error);
+
+            });
+
     }
+);
 
-    const scoreDescription=document.getElementById("scoreDescription");
-    const scoreResult=document.getElementById("scoreResult");
-    scoreDescription.style.display="block";
-    scoreResult.style.display="block";
 
-    const savedScore = localStorage.getItem("resumeScore");
+// ========================================
+// RESUME SCORE
+// ========================================
 
-    if (savedScore === null) {
+const scoreBtn =
+    document.getElementById("scoreBtn");
+
+
+scoreBtn.addEventListener(
+    "click",
+    function () {
+
+        if (resumeFile.files.length === 0) {
+
+            alert(
+                "Please select your resume first."
+            );
+
+            return;
+        }
+
+
+        const scoreDescription =
+            document.getElementById(
+                "scoreDescription"
+            );
+
+
+        const scoreResult =
+            document.getElementById(
+                "scoreResult"
+            );
+
+
+        scoreDescription.style.display =
+            "block";
+
+
+        scoreResult.style.display =
+            "block";
+
+
+        const savedScore =
+            localStorage.getItem(
+                "resumeScore"
+            );
+
+
+        if (savedScore === null) {
+
+            scoreResult.innerHTML = `
+                <h3>Resume Score</h3>
+                <p>Please analyze your resume first.</p>
+            `;
+
+            return;
+        }
+
+
+        let message = "";
+
+
+        if (savedScore >= 80) {
+
+            message =
+                "Excellent! Your resume has strong content.";
+
+        }
+
+        else if (savedScore >= 60) {
+
+            message =
+                "Good! Your resume can still be improved.";
+
+        }
+
+        else {
+
+            message =
+                "Your resume needs some improvement.";
+
+        }
+
+
         scoreResult.innerHTML = `
-            <h3>Resume Score</h3>
-            <p>Please analyze your resume first.</p>
+
+            <h3>Overall Resume Score</h3>
+
+
+            <div class="score-circle">
+
+                <span>
+                    ${savedScore}%
+                </span>
+
+            </div>
+
+
+            <p>
+                ${message}
+            </p>
+
+
+            <div class="score-item">
+
+                <div class="score-label">
+
+                    <strong>
+                        Sections Score
+                    </strong>
+
+                    <span>
+                        ${localStorage.getItem("sectionScore")}%
+                    </span>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="progress-fill"
+                        style="width: ${localStorage.getItem("sectionScore")}%;">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="score-item">
+
+                <div class="score-label">
+
+                    <strong>
+                        Skills Score
+                    </strong>
+
+                    <span>
+                        ${localStorage.getItem("skillScore")}%
+                    </span>
+
+                </div>
+
+
+                <div class="progress-bar">
+
+                    <div
+                        class="progress-fill"
+                        style="width: ${localStorage.getItem("skillScore")}%;">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <p>
+                <strong>Score is based on:</strong>
+            </p>
+
+
+            <ul>
+
+                <li>Resume sections</li>
+                <li>Technical skills</li>
+                <li>Contact information</li>
+                <li>Education and experience</li>
+                <li>Projects</li>
+
+            </ul>
+
         `;
-        return;
+
     }
+);
 
-    let message = "";
 
-    if (savedScore >= 80) {
-        message = "Excellent! Your resume has strong content.";
-    } else if (savedScore >= 60) {
-        message = "Good! Your resume can still be improved.";
-    } else {
-        message = "Your resume needs some improvement.";
+// ========================================
+// RESET WHEN NEW FILE IS SELECTED
+// ========================================
+
+resumeFile.addEventListener(
+    "change",
+    function () {
+
+        analysisResult.innerHTML = `
+            <p class="result-placeholder">
+                Analyze your resume to see the results.
+            </p>
+        `;
+
+
+        document.getElementById(
+            "scoreResult"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "tipsResult"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "scoreDescription"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "tipsDescription"
+        ).style.display = "none";
+
+
+        localStorage.removeItem(
+            "sectionScore"
+        );
+
+
+        localStorage.removeItem(
+            "skillScore"
+        );
+
+
+        localStorage.removeItem(
+            "resumeScore"
+        );
+
     }
+);
 
-    scoreResult.innerHTML = `
-        <h3>Overall Resume Score</h3>
 
-        <div class="score-circle">
-            <span>${savedScore}%</span>
-        </div>
-
-        <p>${message}</p>
-        <div class="score-item">
-
-            <div class="score-label">
-                <strong>Sections Score</strong>
-                <span>${localStorage.getItem("sectionScore")}%</span>
-            </div>
-
-            <div class="progress-bar">
-                <div
-                    class="progress-fill"
-                    style="width: ${localStorage.getItem("sectionScore")}%;">
-                </div>
-            </div>
-
-       </div>
-       <div class="score-item">
-
-            <div class="score-label">
-                <strong>Skills Score</strong>
-                <span>${localStorage.getItem("skillScore")}%</span>
-            </div>
-
-            <div class="progress-bar">
-                <div
-                    class="progress-fill"
-                    style="width: ${localStorage.getItem("skillScore")}%;">
-                </div>
-            </div>
-
-        </div>
-        
-
-        
-
-        <p><strong>Score is based on:</strong></p>
-
-        <ul>
-            <li>Resume sections</li>
-            <li>Technical skills</li>
-            <li>Contact information</li>
-            <li>Education and experience</li>
-            <li>Projects</li>
-        </ul>
-    `;
-});
-
-// =========================
-// RESET RESULTS WHEN NEW FILE IS SELECTED
-// =========================
-
-resumeFile.addEventListener("change", function () {
-
-    analysisResult.innerHTML = `
-        <p class="result-placeholder">
-            Analyze your resume to see the results.
-        </p>
-    `;
-
-    document.getElementById("scoreResult").style.display = "none";
-    document.getElementById("tipsResult").style.display = "none";
-
-    document.getElementById("scoreDescription").style.display = "none";
-    document.getElementById("tipsDescription").style.display = "none";
-
-    localStorage.removeItem("sectionScore");
-    localStorage.removeItem("skillScore");
-    localStorage.removeItem("resumeScore");
-});
-
-// =========================
+// ========================================
 // DOWNLOAD REPORT
-// =========================
+// ========================================
 
 const downloadReportBtn =
-    document.getElementById("downloadReportBtn");
-    
-    downloadReportBtn.addEventListener("click", function () {
-
-    // Check if a resume is selected
-    if (resumeFile.files.length === 0) {
-        alert("Please select and analyze your resume first.");
-        return;
-    }
-
-    const savedScore =
-        localStorage.getItem("resumeScore");
-
-    // Check if the selected resume has been analyzed
-    if (savedScore === null) {
-        alert("Please analyze your resume first.");
-        return;
-    }
+    document.getElementById(
+        "downloadReportBtn"
+    );
 
 
+downloadReportBtn.addEventListener(
+    "click",
+    function () {
 
-    const sectionScore =
-        localStorage.getItem("sectionScore");
+        if (resumeFile.files.length === 0) {
 
-    const skillScore =
-        localStorage.getItem("skillScore");
+            alert(
+                "Please select and analyze your resume first."
+            );
 
-    const report = `
+            return;
+        }
+
+
+        const savedScore =
+            localStorage.getItem(
+                "resumeScore"
+            );
+
+
+        if (savedScore === null) {
+
+            alert(
+                "Please analyze your resume first."
+            );
+
+            return;
+        }
+
+
+        const sectionScore =
+            localStorage.getItem(
+                "sectionScore"
+            );
+
+
+        const skillScore =
+            localStorage.getItem(
+                "skillScore"
+            );
+
+
+        const report = `
+
 RESUME ANALYSIS REPORT
 ======================
 
@@ -385,20 +909,38 @@ This report is based on:
 - Projects
 
 Thank you for using Resume Analyzer.
+
 `;
 
-    const blob = new Blob([report], {
-        type: "text/plain"
-    });
 
-    const url = URL.createObjectURL(blob);
+        const blob =
+            new Blob(
+                [report],
+                {
+                    type: "text/plain"
+                }
+            );
 
-    const link = document.createElement("a");
 
-    link.href = url;
-    link.download = "Resume-Analysis-Report.txt";
+        const url =
+            URL.createObjectURL(blob);
 
-    link.click();
 
-    URL.revokeObjectURL(url);
-});
+        const link =
+            document.createElement("a");
+
+
+        link.href = url;
+
+
+        link.download =
+            "Resume-Analysis-Report.txt";
+
+
+        link.click();
+
+
+        URL.revokeObjectURL(url);
+
+    }
+);
