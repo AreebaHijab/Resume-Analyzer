@@ -420,3 +420,30 @@ button:hover {
         grid-row: auto !important;
     }
 }
+@media (max-width: 800px) {
+
+    .dashboard-results {
+        margin-top: 20px !important;
+    }
+
+    .dashboard-results .result-header {
+        margin-bottom: 15px !important;
+    }
+
+    .dashboard-results .result-grid {
+        display: block !important;
+    }
+
+    .dashboard-results .result-box {
+        margin-bottom: 15px !important;
+    }
+
+    .dashboard-results .analysis-section {
+        display: block !important;
+    }
+
+    .dashboard-results .score-section,
+    .dashboard-results .tips-section {
+        display: none;
+    }
+}
