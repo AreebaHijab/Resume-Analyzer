@@ -54,6 +54,7 @@
                     </p>
 
                     <button id="tipsBtn">💡 View Tips</button>
+                    <div id="mobileTipsResult"></div>
                 </div>
 
 
@@ -69,6 +70,7 @@
 
                         <button id="scoreBtn">📊 View Score</button>
                         <button id="downloadReportBtn"> Download Report</button>
+                        <div id="mobileScoreResult"></div>
                     </div>
 
             </div>
@@ -91,36 +93,81 @@
     <script src="js/dashboard.js"></script>
 
     <script src="js/analyzer.js"></script>
-        <script>
-            const mobileAnalysisBox =
-                document.getElementById("mobileAnalysisResult");
+    <script>
 
-            const existingAnalysisResult =
-                document.getElementById("analysisResult");
+        const analysisResult =
+            document.getElementById("analysisResult");
 
-            const resultsContainer =
-                document.querySelector(".dashboard-results");
+        const tipsResult =
+            document.getElementById("tipsResult");
 
-            function moveAnalysisResult() {
+        const scoreResult =
+            document.getElementById("scoreResult");
 
-                if (window.innerWidth <= 800) {
 
-                    mobileAnalysisBox.appendChild(existingAnalysisResult);
+        const mobileAnalysisResult =
+            document.getElementById("mobileAnalysisResult");
 
-                } else {
+        const mobileTipsResult =
+            document.getElementById("mobileTipsResult");
 
-                    resultsContainer.insertBefore(
-                        existingAnalysisResult,
-                        resultsContainer.firstChild
-                    );
-                }
+        const mobileScoreResult =
+            document.getElementById("mobileScoreResult");
+
+
+        const resultsContainer =
+            document.querySelector(".dashboard-results");
+
+
+        function moveResults() {
+
+            if (window.innerWidth <= 800) {
+
+                // Analysis → Analyzer card
+                mobileAnalysisResult.appendChild(
+                    analysisResult
+                );
+
+
+                // Tips → Tips card
+                mobileTipsResult.appendChild(
+                    tipsResult
+                );
+
+
+                // Score → Score card
+                mobileScoreResult.appendChild(
+                    scoreResult
+                );
+
+            } else {
+
+                // Desktop → Results section
+
+                resultsContainer.appendChild(
+                    analysisResult
+                );
+
+                resultsContainer.appendChild(
+                    tipsResult
+                );
+
+                resultsContainer.appendChild(
+                    scoreResult
+                );
             }
+        }
 
-            moveAnalysisResult();
 
-            window.addEventListener("resize", moveAnalysisResult);
-     </script>
-            
+        moveResults();
+
+
+        window.addEventListener(
+            "resize",
+            moveResults
+        );
+
+    </script>
 
 </body>
 </html>
