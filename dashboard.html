@@ -39,6 +39,7 @@
                     <input type="file" id="resumeFile" accept=".txt,.pdf,.doc,.docx">
 
                     <button id="analyzeBtn">🔍 Analyze Resume</button>
+                    <div id="mobileAnalysisResult"></div>
                 </div>
 
 
@@ -90,5 +91,34 @@
     <script src="js/dashboard.js"></script>
 
     <script src="js/analyzer.js"></script>
+    
+
+        <script>
+            const analysisResult = document.getElementById("analysisResult");
+            const mobileAnalysisResult =
+                document.getElementById("mobileAnalysisResult");
+
+            const desktopResults =
+                document.querySelector(".dashboard-results");
+
+            function moveAnalysisResult() {
+
+                if (window.innerWidth <= 800) {
+
+                    mobileAnalysisResult.appendChild(analysisResult);
+
+                } else {
+
+                    desktopResults.insertBefore(
+                        analysisResult,
+                        desktopResults.firstChild
+                    );
+                }
+            }
+
+            moveAnalysisResult();
+
+            window.addEventListener("resize", moveAnalysisResult);
+      </script>
 </body>
 </html>
