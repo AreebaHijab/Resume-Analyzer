@@ -374,6 +374,7 @@ button:hover {
         gap: 18px !important;
         margin: 0 auto !important;
     }
+    
 
     .card {
         width: 100% !important;
@@ -489,6 +490,13 @@ button:hover {
     #mobileTipsResult ul,
     #mobileScoreResult ul {
         padding-left: 20px;
+    }
+
+}
+@media (max-width: 800px) {
+
+    .dashboard-results {
+        display: none !important;
     }
 
 }
