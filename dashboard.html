@@ -91,27 +91,27 @@
     <script src="js/dashboard.js"></script>
 
     <script src="js/analyzer.js"></script>
-    
-
         <script>
-            const analysisResult = document.getElementById("analysisResult");
-            const mobileAnalysisResult =
+            const mobileAnalysisBox =
                 document.getElementById("mobileAnalysisResult");
 
-            const desktopResults =
+            const existingAnalysisResult =
+                document.getElementById("analysisResult");
+
+            const resultsContainer =
                 document.querySelector(".dashboard-results");
 
             function moveAnalysisResult() {
 
                 if (window.innerWidth <= 800) {
 
-                    mobileAnalysisResult.appendChild(analysisResult);
+                    mobileAnalysisBox.appendChild(existingAnalysisResult);
 
                 } else {
 
-                    desktopResults.insertBefore(
-                        analysisResult,
-                        desktopResults.firstChild
+                    resultsContainer.insertBefore(
+                        existingAnalysisResult,
+                        resultsContainer.firstChild
                     );
                 }
             }
@@ -119,6 +119,8 @@
             moveAnalysisResult();
 
             window.addEventListener("resize", moveAnalysisResult);
-      </script>
+     </script>
+            
+
 </body>
 </html>
