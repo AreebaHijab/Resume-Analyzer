@@ -789,56 +789,72 @@ scoreBtn.addEventListener(
 // RESET WHEN NEW FILE IS SELECTED
 // ========================================
 
-resumeFile.addEventListener(
-    "change",
-    function () {
+resumeFile.addEventListener("change", function () {
 
-        analysisResult.innerHTML = `
-            <p class="result-placeholder">
-                Analyze your resume to see the results.
-            </p>
-        `;
-
-
-        document.getElementById(
-            "scoreResult"
-        ).style.display = "none";
+    // Reset analysis
+    analysisResult.innerHTML = `
+        <p class="result-placeholder">
+            Analyze your resume to see the results.
+        </p>
+    `;
 
 
-        document.getElementById(
-            "tipsResult"
-        ).style.display = "none";
+    // Reset desktop results
+    const scoreResult =
+        document.getElementById("scoreResult");
+
+    const tipsResult =
+        document.getElementById("tipsResult");
 
 
-        document.getElementById(
-            "scoreDescription"
-        ).style.display = "none";
+    scoreResult.innerHTML = "";
+    tipsResult.innerHTML = "";
 
 
-        document.getElementById(
-            "tipsDescription"
-        ).style.display = "none";
-
-        document.getElementById("mobileScoreResult").innerHTML = "";
-        document.getElementById("mobileTipsResult").innerHTML = "";
+    scoreResult.style.display = "none";
+    tipsResult.style.display = "none";
 
 
-        localStorage.removeItem(
-            "sectionScore"
-        );
+    // Reset descriptions
+    document.getElementById(
+        "scoreDescription"
+    ).style.display = "none";
+
+    document.getElementById(
+        "tipsDescription"
+    ).style.display = "none";
 
 
-        localStorage.removeItem(
-            "skillScore"
-        );
+    // Reset mobile results
+    const mobileAnalysis =
+        document.getElementById("mobileAnalysisResult");
+
+    const mobileTips =
+        document.getElementById("mobileTipsResult");
+
+    const mobileScore =
+        document.getElementById("mobileScoreResult");
 
 
-        localStorage.removeItem(
-            "resumeScore"
-        );
-
+    if (mobileAnalysis) {
+        mobileAnalysis.innerHTML = "";
     }
-);
+
+    if (mobileTips) {
+        mobileTips.innerHTML = "";
+    }
+
+    if (mobileScore) {
+        mobileScore.innerHTML = "";
+    }
+
+
+    // Remove old saved score
+    localStorage.removeItem("sectionScore");
+    localStorage.removeItem("skillScore");
+    localStorage.removeItem("resumeScore");
+
+});
 
 
 // ========================================
