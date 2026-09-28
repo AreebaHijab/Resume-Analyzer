@@ -15,11 +15,6 @@ const technicalSkills = [
     "node.js"
 ];
 
-
-// ========================================
-// PDF TEXT READER
-// ========================================
-
 async function readPDF(file) {
 
     const arrayBuffer = await file.arrayBuffer();
@@ -48,11 +43,6 @@ async function readPDF(file) {
     return fullText;
 }
 
-
-// ========================================
-// DOCX TEXT READER
-// ========================================
-
 async function readDOCX(file) {
 
     const arrayBuffer = await file.arrayBuffer();
@@ -62,21 +52,11 @@ async function readDOCX(file) {
     });
 
     return result.value;
+
 }
-
-
-// ========================================
-// MAIN ANALYZER
-// ========================================
-
 function analyzeResume(resumeText, fileName) {
 
     resumeText = resumeText.toLowerCase();
-
-
-    // ========================================
-    // TECHNICAL SKILLS
-    // ========================================
 
     let foundSkills = [];
     let missingSkills = [];
@@ -99,11 +79,6 @@ function analyzeResume(resumeText, fileName) {
         }
 
     });
-
-
-    // ========================================
-    // RESUME SECTIONS
-    // ========================================
 
     const keywords = [
         "skills",
@@ -129,21 +104,12 @@ function analyzeResume(resumeText, fileName) {
 
     });
 
-
-    // ========================================
-    // EMAIL
-    // ========================================
-
     const emailPattern =
         /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
 
     const hasEmail =
         emailPattern.test(resumeText);
 
-
-    // ========================================
-    // PHONE
-    // ========================================
 
     const cleanResumeText =
         resumeText.replace(/[\D]/g, "");
@@ -176,18 +142,8 @@ function analyzeResume(resumeText, fileName) {
 
     }
 
-
-    // ========================================
-    // TOTAL SECTIONS
-    // ========================================
-
     const totalSections =
         keywords.length + 2;
-
-
-    // ========================================
-    // IMPROVEMENT SUGGESTIONS
-    // ========================================
 
     let suggestions = [];
 
@@ -263,11 +219,6 @@ function analyzeResume(resumeText, fileName) {
 
     }
 
-
-    // ========================================
-    // SCORE CALCULATION
-    // ========================================
-
     const sectionScore =
         Math.round(
             (found / totalSections) * 100
@@ -285,11 +236,6 @@ function analyzeResume(resumeText, fileName) {
             (sectionScore + skillScore) / 2
         );
 
-
-    // ========================================
-    // SAVE SCORES
-    // ========================================
-
     localStorage.setItem(
         "sectionScore",
         sectionScore
@@ -304,11 +250,6 @@ function analyzeResume(resumeText, fileName) {
         "resumeScore",
         score
     );
-
-
-    // ========================================
-    // DISPLAY ANALYSIS
-    // ========================================
 
     analysisResult.innerHTML = `
 
@@ -377,11 +318,6 @@ function analyzeResume(resumeText, fileName) {
     `;
 }
 
-
-// ========================================
-// ANALYZE BUTTON
-// ========================================
-
 analyzeBtn.addEventListener(
     "click",
     async function () {
@@ -402,11 +338,6 @@ analyzeBtn.addEventListener(
         const fileName =
             file.name.toLowerCase();
 
-
-        // ========================================
-        // FILE TYPE CHECK
-        // ========================================
-
         if (
             !fileName.endsWith(".txt") &&
             !fileName.endsWith(".docx") &&
@@ -419,11 +350,6 @@ analyzeBtn.addEventListener(
             return;
         }
 
-
-        // ========================================
-        // LOADING MESSAGE
-        // ========================================
-
         analysisResult.innerHTML = `
             <p>Analyzing your resume...</p>
         `;
@@ -433,22 +359,11 @@ analyzeBtn.addEventListener(
 
             let resumeText = "";
 
-
-            // ========================================
-            // TXT
-            // ========================================
-
             if (fileName.endsWith(".txt")) {
 
                 resumeText =
                     await file.text();
-
-            }
-
-
-            // ========================================
-            // DOCX
-            // ========================================
+            }    
 
             else if (fileName.endsWith(".docx")) {
 
@@ -457,22 +372,12 @@ analyzeBtn.addEventListener(
 
             }
 
-
-            // ========================================
-            // PDF
-            // ========================================
-
             else if (fileName.endsWith(".pdf")) {
 
                 resumeText =
                     await readPDF(file);
 
             }
-
-
-            // ========================================
-            // EMPTY FILE CHECK
-            // ========================================
 
             if (!resumeText.trim()) {
 
@@ -484,11 +389,6 @@ analyzeBtn.addEventListener(
 
                 return;
             }
-
-
-            // ========================================
-            // RUN ANALYSIS
-            // ========================================
 
             analyzeResume(
                 resumeText,
@@ -509,11 +409,6 @@ analyzeBtn.addEventListener(
 
     }
 );
-
-
-// ========================================
-// RESUME TIPS - FETCH API
-// ========================================
 
 const tipsBtn =
     document.getElementById("tipsBtn");
@@ -605,11 +500,6 @@ tipsBtn.addEventListener(
 
     }
 );
-
-
-// ========================================
-// RESUME SCORE
-// ========================================
 
 const scoreBtn =
     document.getElementById("scoreBtn");
@@ -784,11 +674,6 @@ scoreBtn.addEventListener(
     }
 );
 
-
-// ========================================
-// RESET WHEN NEW FILE IS SELECTED
-// ========================================
-
 resumeFile.addEventListener("change", function () {
 
     // Reset analysis
@@ -856,11 +741,6 @@ resumeFile.addEventListener("change", function () {
 
 });
 
-
-// ========================================
-// DOWNLOAD REPORT
-// ========================================
-
 const downloadReportBtn =
     document.getElementById(
         "downloadReportBtn"
@@ -911,8 +791,6 @@ downloadReportBtn.addEventListener(
 
         const report = `
 
-RESUME ANALYSIS REPORT
-======================
 
 Overall Resume Score: ${savedScore}%
 
