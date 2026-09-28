@@ -146,10 +146,10 @@ function analyzeResume(resumeText, fileName) {
     // ========================================
 
     const cleanResumeText =
-        resumeText.replace(/[\s-]/g, "");
+        resumeText.replace(/[\D]/g, "");
 
     const phonePattern =
-        /(?:\+92|0092|0)3\d{9}/;
+        /(?:92|0092|0)?3\d{9}/;
 
     const hasPhone =
         phonePattern.test(cleanResumeText);
@@ -818,6 +818,9 @@ resumeFile.addEventListener(
         document.getElementById(
             "tipsDescription"
         ).style.display = "none";
+
+        document.getElementById("mobileScoreResult").innerHTML = "";
+        document.getElementById("mobileTipsResult").innerHTML = "";
 
 
         localStorage.removeItem(
